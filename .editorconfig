@@ -1,0 +1,37 @@
+# EditorConfig — https://editorconfig.org
+# Частично дублирует настройки из .vscode/settings.json,
+# но работает во всех редакторах и для всех участников проекта.
+#
+# ВАЖНО: спецификация EditorConfig допускает для charset только значения
+# latin1 | utf-8 | utf-8-bom | utf-16be | utf-16le.
+# Кодировка windows-1251 (для *.mac / [csharp]) в .editorconfig НЕВЫРАЗИМА —
+# она остаётся заданной в .vscode/settings.json.
+
+root = true
+
+[*]
+charset = utf-8
+end_of_line = crlf
+insert_final_newline = true
+trim_trailing_whitespace = true
+indent_style = space
+indent_size = 4
+
+[*.py]
+charset = utf-8
+indent_style = space
+indent_size = 4
+tab_width = 4
+max_line_length = 79
+[*.pyi]
+charset = utf-8
+indent_style = space
+indent_size = 4
+
+[*.{md,markdown}]
+charset = utf-8
+trim_trailing_whitespace = false
+
+[Makefile]
+indent_style = tab
+

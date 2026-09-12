@@ -1,0 +1,37 @@
+.PHONY: lint-all typing-all tests-all check-all \
+        lint-file typing-file test-file check-file \
+        pre-commit sync
+
+check-all: lint-all typing-all tests-all
+
+check-file: lint-file typing-file test-file
+
+lint-all:
+	uv run ruff check .
+
+typing-all:
+	uv run --with mypy -- python -m mypy --strict .
+
+tests-all:
+	uv run python -m unittest discover -v -s tests -t .
+
+lint-file:
+	uv run ruff check --force-exclude $(FILE)
+
+typing-file:
+	uv run --with mypy -- python -m mypy --strict $(FILE)
+
+test-file:
+	uv run python -m unittest discover -v -s $(dir $(FILE)) -t . -p $(notdir $(FILE))
+
+pre-commit:
+	uv run python -m pre_commit run --all-files
+
+example-breakpoint:
+	uv run python -m examples.example_breakpoint
+
+example-decorator:
+	uv run python -m examples.example_decorator
+
+sync:
+	uv sync

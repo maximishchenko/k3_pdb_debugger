@@ -1,0 +1,97 @@
+[project]
+name = "k3-pdb-debugger"
+version = "0.0.1"
+description = "Wrapper for run pdb in K3-Mebel 8.1 Application"
+readme = "README.md"
+license = {file = "LICENSE"}
+authors = [
+    {name = "Maxim Ishchenko", email = "m.g.ishchenko@yandex.ru"},
+]
+requires-python = ">=3.7"
+dependencies = []
+
+[dependency-groups]
+dev = [
+    "commitizen>=3.9.1",
+    "mypy>=1.4.1",
+    "pre-commit>=2.21.0",
+    "ruff>=0.16.6",
+]
+
+[tool.ruff]
+fix = false
+
+exclude = [
+    '.git',
+    '.venv',
+    '__pycache__',
+    '.ruff_cache',
+    '.mypy_cache',
+]
+
+select = [
+    "E",
+    "F",
+    "I",
+    "UP",
+    "N",
+    "B",
+    "D",
+    "C4",
+    "RUF",
+]
+
+ignore = [
+    "C408",
+    "RUF001",
+    "RUF002",
+    "RUF003",
+    "RUF100",
+    "S110",
+    "D203",
+    "D212",
+    "D213",
+]
+
+line-length = 79
+target-version = "py37"
+
+[tool.ruff.isort]
+known-first-party = ["src"]
+
+[tool.ruff.format]
+quote-style = "double"
+indent-style = "space"
+line-ending = "auto"
+
+[tool.mypy]
+ignore_missing_imports = true
+warn_return_any = true
+warn_unused_configs = true
+disallow_untyped_defs = true
+strict = true
+
+
+explicit_package_bases = true
+namespace_packages = true
+
+exclude = [
+    '.venv',
+    'tests/',
+]
+
+[tool.pyright]
+include = ["src"]
+ignore = ["tests"]
+exclude = [
+    "**/node_modules",
+    "**/__pycache__",
+    ".git",
+    ".venv",
+    "build",
+    "dist",
+]
+typeCheckingMode = "strict"
+
+[tool.uv]
+link-mode = "copy"
