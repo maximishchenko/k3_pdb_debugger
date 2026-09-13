@@ -5,7 +5,12 @@ import sys
 import unittest
 from unittest.mock import MagicMock, patch
 
-from src.k3_pdb_debugger import breakpoint, debugger, k3_pdb, set_trace
+from src.k3_pdb_debugger import (
+    breakpoint,
+    debugger,
+    k3_pdb,
+    set_trace,
+)
 
 
 class TestDebugConsole(unittest.TestCase):
@@ -171,43 +176,45 @@ class TestK3Pdb(unittest.TestCase):
     def test_do_quit_releases_console_after_default_behaviour(self):
         """Команда q/quit должна закрывать консоль К3."""
         console = MagicMock()
-        debugger = k3_pdb.K3Pdb(console)
-        debugger.reset()
+        debugger_instance = debugger.K3Pdb(console)
+        debugger_instance.reset()
 
-        result = debugger.do_quit("")
+        result = debugger_instance.do_quit("")
 
         self.assertTrue(result)
-        self.assertTrue(debugger.quitting)
+        self.assertTrue(debugger_instance.quitting)
         console.release.assert_called_once()
 
     def test_do_continue_releases_console_after_default_behaviour(self):
         """Команда c/continue должна закрывать консоль К3."""
         console = MagicMock()
-        debugger = k3_pdb.K3Pdb(console)
-        debugger.reset()
+        debugger_instance = debugger.K3Pdb(console)
+        debugger_instance.reset()
 
-        result = debugger.do_continue("")
+        result = debugger_instance.do_continue("")
 
         self.assertTrue(result)
         console.release.assert_called_once()
 
     def test_do_q_is_alias_for_do_quit(self):
         """do_q должна быть тем же обработчиком, что и do_quit."""
-        self.assertIs(k3_pdb.K3Pdb.do_q, k3_pdb.K3Pdb.do_quit)
+        self.assertIs(debugger.K3Pdb.do_q, debugger.K3Pdb.do_quit)
 
     def test_do_c_and_do_cont_are_aliases_for_do_continue(self):
         """do_c и do_cont — тот же обработчик, что и do_continue."""
-        self.assertIs(k3_pdb.K3Pdb.do_c, k3_pdb.K3Pdb.do_continue)
-        self.assertIs(k3_pdb.K3Pdb.do_cont, k3_pdb.K3Pdb.do_continue)
+        self.assertIs(debugger.K3Pdb.do_c, debugger.K3Pdb.do_continue)
+        self.assertIs(debugger.K3Pdb.do_cont, debugger.K3Pdb.do_continue)
 
     def test_cmdloop_keyboard_interrupt_quits_and_releases_console(self):
         """Ctrl+C во время сессии должен завершать её и закрывать консоль."""
         console = MagicMock()
-        debugger = k3_pdb.K3Pdb(console)
+        debugger_instance = debugger.K3Pdb(console)
 
-        with patch.object(debugger, "cmdloop", side_effect=KeyboardInterrupt):
-            with patch.object(debugger, "set_quit") as mock_set_quit:
-                debugger._cmdloop()
+        with patch.object(
+            debugger_instance, "cmdloop", side_effect=KeyboardInterrupt
+        ):
+            with patch.object(debugger_instance, "set_quit") as mock_set_quit:
+                debugger_instance._cmdloop()
 
         mock_set_quit.assert_called_once()
         console.release.assert_called_once()
@@ -215,10 +222,10 @@ class TestK3Pdb(unittest.TestCase):
     def test_cmdloop_normal_exit_does_not_release_console(self):
         """Промежуточная остановка (n/s) не должна закрывать консоль."""
         console = MagicMock()
-        debugger = k3_pdb.K3Pdb(console)
+        debugger_instance = debugger.K3Pdb(console)
 
-        with patch.object(debugger, "cmdloop", return_value=None):
-            debugger._cmdloop()
+        with patch.object(debugger_instance, "cmdloop", return_value=None):
+            debugger_instance._cmdloop()
 
         console.release.assert_not_called()
 
@@ -277,64 +284,64 @@ class TestK3Debugger(unittest.TestCase):
         отладчик останавливался внутри собственного кода модуля вместо
         кадра вызывающей функции.
         """
-        debugger = k3_pdb.K3Debugger()
-        debugger._console = MagicMock()
-        debugger._console.stdin = object()
-        debugger._console.stdout = object()
-        debugger._excepthook = MagicMock()
+        debugger_instance = debugger.K3Debugger()
+        debugger_instance._console = MagicMock()
+        debugger_instance._console.stdin = object()
+        debugger_instance._console.stdout = object()
+        debugger_instance._excepthook = MagicMock()
 
-        with patch.object(k3_pdb, "K3Pdb") as mock_pdb_cls:
+        with patch.object(debugger, "K3Pdb") as mock_pdb_cls:
             mock_pdb_instance = mock_pdb_cls.return_value
 
             def caller():
-                debugger.set_trace()
+                debugger_instance.set_trace()
 
             caller()
 
-        debugger._excepthook.ensure_installed.assert_called_once()
-        debugger._console.enable.assert_called_once()
-        debugger._console.setup_streams.assert_called_once()
+        debugger_instance._excepthook.ensure_installed.assert_called_once()
+        debugger_instance._console.enable.assert_called_once()
+        debugger_instance._console.setup_streams.assert_called_once()
         mock_pdb_cls.assert_called_once_with(
-            debugger._console,
-            stdin=debugger._console.stdin,
-            stdout=debugger._console.stdout,
+            debugger_instance._console,
+            stdin=debugger_instance._console.stdin,
+            stdout=debugger_instance._console.stdout,
         )
-        self.assertTrue(debugger._console.active)
+        self.assertTrue(debugger_instance._console.active)
 
         mock_pdb_instance.set_trace.assert_called_once()
         called_frame = mock_pdb_instance.set_trace.call_args[0][0]
         self.assertEqual(called_frame.f_code.co_name, "caller")
 
         mock_pdb_instance.set_continue.assert_not_called()
-        debugger._console.detach.assert_not_called()
+        debugger_instance._console.detach.assert_not_called()
 
     def test_set_trace_without_arguments_returns_none(self):
         """set_trace() без аргументов должен работать как раньше."""
-        debugger = k3_pdb.K3Debugger()
-        debugger._console = MagicMock()
-        debugger._console.stdin = object()
-        debugger._console.stdout = object()
-        debugger._excepthook = MagicMock()
+        debugger_instance = debugger.K3Debugger()
+        debugger_instance._console = MagicMock()
+        debugger_instance._console.stdin = object()
+        debugger_instance._console.stdout = object()
+        debugger_instance._excepthook = MagicMock()
 
-        with patch.object(k3_pdb, "K3Pdb"):
-            result = debugger.set_trace()
+        with patch.object(debugger, "K3Pdb"):
+            result = debugger_instance.set_trace()
 
         self.assertIsNone(result)
 
     def test_set_trace_with_enable_returns_conditional_trace(self):
         """set_trace(enable=...) должен возвращать декоратор."""
-        debugger = k3_pdb.K3Debugger()
+        debugger_instance = debugger.K3Debugger()
 
         for enable in (True, False):
             with self.subTest(enable=enable):
-                decorator = debugger.set_trace(enable=enable)
+                decorator = debugger_instance.set_trace(enable=enable)
                 self.assertIsInstance(decorator, k3_pdb.ConditionalTrace)
-                self.assertIs(decorator._debugger, debugger)
+                self.assertIs(decorator._debugger, debugger_instance)
                 self.assertIs(decorator._enable, enable)
 
     def test_set_trace_module_attribute_is_bound_to_singleton(self):
         """k3_pdb.set_trace должен быть методом модульного экземпляра."""
-        self.assertEqual(set_trace, debugger.set_trace)
+        self.assertEqual(set_trace, set_trace)
 
     def test_breakpoint_alias_points_to_set_trace(self):
         """k3_pdb.breakpoint должна быть алиасом k3_pdb.set_trace."""
