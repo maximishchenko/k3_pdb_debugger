@@ -9,14 +9,14 @@ from src.k3_pdb_debugger import breakpoint, debugger, k3_pdb, set_trace
 
 
 class TestDebugConsole(unittest.TestCase):
-    """Тест консоли отладчика (_DebugConsole)."""
+    """Тест консоли отладчика (DebugConsole)."""
 
     @patch.object(k3_pdb._thread, "interrupt_main")
     def test_ctrl_c_interrupts_main_thread_when_active(
         self, mock_interrupt_main
     ):
         """Активная сессия pdb должна прерываться через interrupt_main."""
-        console = k3_pdb._DebugConsole()
+        console = k3_pdb.DebugConsole()
         console.active = True
 
         result = console._on_ctrl_event(k3_pdb.CTRL_C_EVENT)
@@ -29,7 +29,7 @@ class TestDebugConsole(unittest.TestCase):
         self, mock_interrupt_main
     ):
         """Вне сессии pdb Ctrl+C не должен ничего прерывать."""
-        console = k3_pdb._DebugConsole()
+        console = k3_pdb.DebugConsole()
         console.active = False
 
         result = console._on_ctrl_event(k3_pdb.CTRL_C_EVENT)
@@ -48,7 +48,7 @@ class TestDebugConsole(unittest.TestCase):
         в К3-Мебель интерпретатора без initsigs), Windows применяет
         действие по умолчанию — завершает весь процесс К3-Мебель.
         """
-        console = k3_pdb._DebugConsole()
+        console = k3_pdb.DebugConsole()
         for active in (True, False):
             with self.subTest(active=active):
                 console.active = active
@@ -57,7 +57,7 @@ class TestDebugConsole(unittest.TestCase):
 
     def test_other_events_are_not_handled(self):
         """Прочие консольные события обработчик не перехватывает."""
-        console = k3_pdb._DebugConsole()
+        console = k3_pdb.DebugConsole()
 
         result = console._on_ctrl_event(k3_pdb.CTRL_C_EVENT + 1)
 
@@ -68,7 +68,7 @@ class TestDebugConsole(unittest.TestCase):
         self, mock_kernel32
     ):
         """Потоки К3 восстанавливаются, файлы консоли закрываются."""
-        console = k3_pdb._DebugConsole()
+        console = k3_pdb.DebugConsole()
         mock_stdin = MagicMock()
         mock_stdout = MagicMock()
         console.stdin = mock_stdin
@@ -87,7 +87,7 @@ class TestDebugConsole(unittest.TestCase):
         self, mock_kernel32
     ):
         """Созданную консоль нужно освободить вместе с хендлером."""
-        console = k3_pdb._DebugConsole()
+        console = k3_pdb.DebugConsole()
         console._created = True
         sentinel_handler = MagicMock()
         console._ctrl_handler = sentinel_handler
@@ -106,16 +106,16 @@ class TestDebugConsole(unittest.TestCase):
         self, mock_kernel32
     ):
         """Повторный/пустой вызов detach не должен падать."""
-        console = k3_pdb._DebugConsole()
+        console = k3_pdb.DebugConsole()
 
         console.detach()
 
         mock_kernel32.FreeConsole.assert_not_called()
 
-    @patch.object(k3_pdb._DebugConsole, "detach")
+    @patch.object(k3_pdb.DebugConsole, "detach")
     def test_release_clears_active_flag_and_detaches(self, mock_detach):
         """Release должна сбрасывать флаг активности и закрывать консоль."""
-        console = k3_pdb._DebugConsole()
+        console = k3_pdb.DebugConsole()
         console.active = True
 
         console.release()

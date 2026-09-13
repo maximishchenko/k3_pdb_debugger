@@ -98,7 +98,7 @@ _QUIT_MESSAGE = "Выход из режима отладки"
 _F = TypeVar("_F", bound=Callable[..., Any])
 
 
-class _DebugConsole:
+class DebugConsole:
     """Изолированное консольное окно Windows для сессии `pdb`.
 
     Отвечает за создание и закрытие окна консоли, перенаправление
@@ -252,7 +252,7 @@ class K3Pdb(pdb.Pdb):
     """
 
     def __init__(
-        self, console: _DebugConsole, *args: Any, **kwargs: Any
+        self, console: DebugConsole, *args: Any, **kwargs: Any
     ) -> None:
         """Связать сессию `pdb` с консолью, которую нужно закрыть."""
         super().__init__(*args, **kwargs)
@@ -326,7 +326,7 @@ class K3Debugger:
 
     def __init__(self) -> None:
         """Создать собственные консоль и обработчик исключений."""
-        self._console = _DebugConsole()
+        self._console = DebugConsole()
         self._excepthook = BdbQuitExceptHook()
 
     @overload
