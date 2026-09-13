@@ -26,7 +26,7 @@ repos:
 
           - id: commitizen
             name: commitizen check
-            entry: uv run python -m commitizen check --commit-msg-file
+            entry: make check-commit-msg
             language: system
             pass_filenames: true
             stages: [commit-msg]

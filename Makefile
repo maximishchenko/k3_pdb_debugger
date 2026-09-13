@@ -1,6 +1,6 @@
 .PHONY: lint-all typing-all tests-all check-all \
         lint-file typing-file test-file check-file \
-        pre-commit sync
+        pre-commit sync check-commit-msg
 
 check-all: lint-all typing-all tests-all
 
@@ -34,7 +34,10 @@ example-decorator:
 	uv run python -m examples.example_decorator
 
 check-commit-msg:
-	uv run python -m commitizen check --commit-msg-file $(FILE)
+	uv run python -m commitizen check --commit-msg-file $(filter-out $@,$(MAKECMDGOALS))
+
+%:
+	@:
 
 sync:
 	uv sync
