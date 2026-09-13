@@ -1,0 +1,32 @@
+repos:
+    - repo: local
+      hooks:
+          - id: ruff
+            name: ruff check
+            entry: make lint-all
+            language: system
+            types: [python]
+            pass_filenames: false
+            always_run: true
+
+          - id: mypy
+            name: mypy strict check
+            entry: make typing-all
+            language: system
+            types: [python]
+            pass_filenames: false
+            always_run: true
+
+          - id: unittest
+            name: run unittests
+            entry: make tests-all
+            language: system
+            pass_filenames: false
+            always_run: true
+
+          - id: commitizen
+            name: commitizen check
+            entry: uv run python -m commitizen check --commit-msg-file
+            language: system
+            pass_filenames: true
+            stages: [commit-msg]

@@ -2,10 +2,10 @@
 
 from __future__ import annotations
 
-from src.k3_pdb_debugger import k3_pdb
+from src.k3_pdb_debugger import set_trace
 
 
-@k3_pdb.set_trace(enable=True)
+@set_trace(enable=True)
 def function(a: int | float, b: int | float) -> int | float:
     """Return (a ** b)/10 .
 

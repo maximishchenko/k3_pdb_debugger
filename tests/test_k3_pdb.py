@@ -5,7 +5,7 @@ import sys
 import unittest
 from unittest.mock import MagicMock, patch
 
-from src.k3_pdb_debugger import k3_pdb
+from src.k3_pdb_debugger import breakpoint, debugger, k3_pdb, set_trace
 
 
 class TestDebugConsole(unittest.TestCase):
@@ -125,11 +125,11 @@ class TestDebugConsole(unittest.TestCase):
 
 
 class TestBdbQuitExceptHook(unittest.TestCase):
-    """Тест перехвата BdbQuit в sys.excepthook (_BdbQuitExceptHook)."""
+    """Тест перехвата BdbQuit в sys.excepthook (BdbQuitExceptHook)."""
 
     def test_bdb_quit_is_replaced_with_short_message(self):
         """BdbQuit не должен показываться в консоли К3 трейсбеком."""
-        hook = k3_pdb._BdbQuitExceptHook()
+        hook = k3_pdb.BdbQuitExceptHook()
         hook._original = MagicMock()
 
         with patch("builtins.print") as mock_print:
@@ -140,7 +140,7 @@ class TestBdbQuitExceptHook(unittest.TestCase):
 
     def test_other_exceptions_are_forwarded_unchanged(self):
         """Прочие исключения должны обрабатываться как обычно."""
-        hook = k3_pdb._BdbQuitExceptHook()
+        hook = k3_pdb.BdbQuitExceptHook()
         hook._original = MagicMock()
         exc_value = ValueError("boom")
 
@@ -150,7 +150,7 @@ class TestBdbQuitExceptHook(unittest.TestCase):
 
     def test_ensure_installed_replaces_hook_once(self):
         """Хук должен подменяться единожды и указывать на себя."""
-        hook = k3_pdb._BdbQuitExceptHook()
+        hook = k3_pdb.BdbQuitExceptHook()
         original_hook = sys.excepthook
         try:
             sys.excepthook = original_hook
@@ -166,12 +166,12 @@ class TestBdbQuitExceptHook(unittest.TestCase):
 
 
 class TestK3Pdb(unittest.TestCase):
-    """Тест сессии отладчика _K3Pdb."""
+    """Тест сессии отладчика K3Pdb."""
 
     def test_do_quit_releases_console_after_default_behaviour(self):
         """Команда q/quit должна закрывать консоль К3."""
         console = MagicMock()
-        debugger = k3_pdb._K3Pdb(console)
+        debugger = k3_pdb.K3Pdb(console)
         debugger.reset()
 
         result = debugger.do_quit("")
@@ -183,7 +183,7 @@ class TestK3Pdb(unittest.TestCase):
     def test_do_continue_releases_console_after_default_behaviour(self):
         """Команда c/continue должна закрывать консоль К3."""
         console = MagicMock()
-        debugger = k3_pdb._K3Pdb(console)
+        debugger = k3_pdb.K3Pdb(console)
         debugger.reset()
 
         result = debugger.do_continue("")
@@ -193,17 +193,17 @@ class TestK3Pdb(unittest.TestCase):
 
     def test_do_q_is_alias_for_do_quit(self):
         """do_q должна быть тем же обработчиком, что и do_quit."""
-        self.assertIs(k3_pdb._K3Pdb.do_q, k3_pdb._K3Pdb.do_quit)
+        self.assertIs(k3_pdb.K3Pdb.do_q, k3_pdb.K3Pdb.do_quit)
 
     def test_do_c_and_do_cont_are_aliases_for_do_continue(self):
         """do_c и do_cont — тот же обработчик, что и do_continue."""
-        self.assertIs(k3_pdb._K3Pdb.do_c, k3_pdb._K3Pdb.do_continue)
-        self.assertIs(k3_pdb._K3Pdb.do_cont, k3_pdb._K3Pdb.do_continue)
+        self.assertIs(k3_pdb.K3Pdb.do_c, k3_pdb.K3Pdb.do_continue)
+        self.assertIs(k3_pdb.K3Pdb.do_cont, k3_pdb.K3Pdb.do_continue)
 
     def test_cmdloop_keyboard_interrupt_quits_and_releases_console(self):
         """Ctrl+C во время сессии должен завершать её и закрывать консоль."""
         console = MagicMock()
-        debugger = k3_pdb._K3Pdb(console)
+        debugger = k3_pdb.K3Pdb(console)
 
         with patch.object(debugger, "cmdloop", side_effect=KeyboardInterrupt):
             with patch.object(debugger, "set_quit") as mock_set_quit:
@@ -215,7 +215,7 @@ class TestK3Pdb(unittest.TestCase):
     def test_cmdloop_normal_exit_does_not_release_console(self):
         """Промежуточная остановка (n/s) не должна закрывать консоль."""
         console = MagicMock()
-        debugger = k3_pdb._K3Pdb(console)
+        debugger = k3_pdb.K3Pdb(console)
 
         with patch.object(debugger, "cmdloop", return_value=None):
             debugger._cmdloop()
@@ -224,7 +224,7 @@ class TestK3Pdb(unittest.TestCase):
 
 
 class TestConditionalTrace(unittest.TestCase):
-    """Тест декоратора условного запуска отладки (_ConditionalTrace)."""
+    """Тест декоратора условного запуска отладки (ConditionalTrace)."""
 
     def test_disabled_decorator_returns_function_unchanged(self):
         """enable=False должен возвращать исходную функцию как есть."""
@@ -233,7 +233,7 @@ class TestConditionalTrace(unittest.TestCase):
         def func(a, b):
             return a + b
 
-        decorated = k3_pdb._ConditionalTrace(debugger, False)(func)
+        decorated = k3_pdb.ConditionalTrace(debugger, False)(func)
 
         self.assertIs(decorated, func)
         debugger.set_trace.assert_not_called()
@@ -248,7 +248,7 @@ class TestConditionalTrace(unittest.TestCase):
             calls.append("func")
             return a + b
 
-        decorated = k3_pdb._ConditionalTrace(debugger, True)(func)
+        decorated = k3_pdb.ConditionalTrace(debugger, True)(func)
         result = decorated(2, 3)
 
         self.assertEqual(result, 5)
@@ -261,13 +261,13 @@ class TestConditionalTrace(unittest.TestCase):
         def func(a, b):
             return a + b
 
-        decorated = k3_pdb._ConditionalTrace(debugger, True)(func)
+        decorated = k3_pdb.ConditionalTrace(debugger, True)(func)
 
         self.assertEqual(decorated.__name__, "func")
 
 
 class TestK3Debugger(unittest.TestCase):
-    """Тест точки входа отладчика (_K3Debugger.set_trace)."""
+    """Тест точки входа отладчика (K3Debugger.set_trace)."""
 
     def test_arms_debugger_for_immediate_caller_frame_only(self):
         """set_trace не должна выполнять код после взведения трассировки.
@@ -277,13 +277,13 @@ class TestK3Debugger(unittest.TestCase):
         отладчик останавливался внутри собственного кода модуля вместо
         кадра вызывающей функции.
         """
-        debugger = k3_pdb._K3Debugger()
+        debugger = k3_pdb.K3Debugger()
         debugger._console = MagicMock()
         debugger._console.stdin = object()
         debugger._console.stdout = object()
         debugger._excepthook = MagicMock()
 
-        with patch.object(k3_pdb, "_K3Pdb") as mock_pdb_cls:
+        with patch.object(k3_pdb, "K3Pdb") as mock_pdb_cls:
             mock_pdb_instance = mock_pdb_cls.return_value
 
             def caller():
@@ -310,35 +310,35 @@ class TestK3Debugger(unittest.TestCase):
 
     def test_set_trace_without_arguments_returns_none(self):
         """set_trace() без аргументов должен работать как раньше."""
-        debugger = k3_pdb._K3Debugger()
+        debugger = k3_pdb.K3Debugger()
         debugger._console = MagicMock()
         debugger._console.stdin = object()
         debugger._console.stdout = object()
         debugger._excepthook = MagicMock()
 
-        with patch.object(k3_pdb, "_K3Pdb"):
+        with patch.object(k3_pdb, "K3Pdb"):
             result = debugger.set_trace()
 
         self.assertIsNone(result)
 
     def test_set_trace_with_enable_returns_conditional_trace(self):
         """set_trace(enable=...) должен возвращать декоратор."""
-        debugger = k3_pdb._K3Debugger()
+        debugger = k3_pdb.K3Debugger()
 
         for enable in (True, False):
             with self.subTest(enable=enable):
                 decorator = debugger.set_trace(enable=enable)
-                self.assertIsInstance(decorator, k3_pdb._ConditionalTrace)
+                self.assertIsInstance(decorator, k3_pdb.ConditionalTrace)
                 self.assertIs(decorator._debugger, debugger)
                 self.assertIs(decorator._enable, enable)
 
     def test_set_trace_module_attribute_is_bound_to_singleton(self):
         """k3_pdb.set_trace должен быть методом модульного экземпляра."""
-        self.assertEqual(k3_pdb.set_trace, k3_pdb._debugger.set_trace)
+        self.assertEqual(set_trace, debugger.set_trace)
 
     def test_breakpoint_alias_points_to_set_trace(self):
         """k3_pdb.breakpoint должна быть алиасом k3_pdb.set_trace."""
-        self.assertIs(k3_pdb.breakpoint, k3_pdb.set_trace)
+        self.assertIs(breakpoint, set_trace)
 
 
 if __name__ == "__main__":

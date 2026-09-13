@@ -33,5 +33,8 @@ example-breakpoint:
 example-decorator:
 	uv run python -m examples.example_decorator
 
+check-commit-msg:
+	uv run python -m commitizen check --commit-msg-file $(FILE)
+
 sync:
 	uv sync

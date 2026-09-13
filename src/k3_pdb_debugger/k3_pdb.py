@@ -201,7 +201,7 @@ class _DebugConsole:
         return False
 
 
-class _BdbQuitExceptHook:
+class BdbQuitExceptHook:
     """Заменяет трейсбек `BdbQuit` коротким сообщением о выходе.
 
     `q`/Ctrl+C прерывают выполнение вызывающего кода через
@@ -238,7 +238,7 @@ class _BdbQuitExceptHook:
         self._original(exc_type, exc_value, exc_tb)
 
 
-class _K3Pdb(pdb.Pdb):
+class K3Pdb(pdb.Pdb):
     """`Pdb`, освобождающий консоль К3 по завершении сессии отладки.
 
     `bdb.Bdb.set_trace` лишь взводит трассировку и сразу возвращает
@@ -289,7 +289,7 @@ class _K3Pdb(pdb.Pdb):
             self._console.release()
 
 
-class _ConditionalTrace:
+class ConditionalTrace:
     """Декоратор, запускающий сессию `pdb` при входе в функцию.
 
     Возвращается методом `_K3Debugger.set_trace`, вызванным с
@@ -298,7 +298,7 @@ class _ConditionalTrace:
     каких-либо изменений — консоль отладчика не открывается.
     """
 
-    def __init__(self, debugger: _K3Debugger, enable: bool) -> None:
+    def __init__(self, debugger: K3Debugger, enable: bool) -> None:
         """Запомнить отладчик и признак включения точки останова."""
         self._debugger = debugger
         self._enable = enable
@@ -316,7 +316,7 @@ class _ConditionalTrace:
         return cast(_F, wrapper)
 
 
-class _K3Debugger:
+class K3Debugger:
     """Точка входа отладчика: открывает консоль К3 и запускает `pdb`.
 
     Объединяет консоль (`_DebugConsole`), подмену `sys.excepthook`
@@ -327,17 +327,15 @@ class _K3Debugger:
     def __init__(self) -> None:
         """Создать собственные консоль и обработчик исключений."""
         self._console = _DebugConsole()
-        self._excepthook = _BdbQuitExceptHook()
+        self._excepthook = BdbQuitExceptHook()
 
     @overload
     def set_trace(self, enable: None = ...) -> None: ...
 
     @overload
-    def set_trace(self, enable: bool) -> _ConditionalTrace: ...
+    def set_trace(self, enable: bool) -> ConditionalTrace: ...
 
-    def set_trace(
-        self, enable: bool | None = None
-    ) -> _ConditionalTrace | None:
+    def set_trace(self, enable: bool | None = None) -> ConditionalTrace | None:
         """Остановиться в вызывающем коде либо вернуть декоратор.
 
         Без аргументов (`k3_pdb.set_trace()`) открывает консоль К3 и
@@ -356,15 +354,15 @@ class _K3Debugger:
         вызывающей функции.
         """
         if enable is not None:
-            return _ConditionalTrace(self, enable)
+            return ConditionalTrace(self, enable)
 
         self._excepthook.ensure_installed()
         self._console.enable()
         self._console.setup_streams()
 
-        caller_frame = sys._getframe().f_back # pyright: ignore[reportPrivateUsage]
+        caller_frame = sys._getframe().f_back  # pyright: ignore[reportPrivateUsage]
 
-        debugger = _K3Pdb(
+        debugger = K3Pdb(
             self._console,
             stdin=self._console.stdin,
             stdout=self._console.stdout,
@@ -373,12 +371,3 @@ class _K3Debugger:
         self._console.active = True
         debugger.set_trace(caller_frame)
         return None
-
-
-_debugger = _K3Debugger()
-
-set_trace = _debugger.set_trace
-
-# Алиас, чтобы можно было использовать k3_pdb.breakpoint(), как в
-# встроенном breakpoint().
-breakpoint = set_trace
