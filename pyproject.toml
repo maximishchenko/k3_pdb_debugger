@@ -81,6 +81,7 @@ exclude = [
 ]
 
 [tool.pyright]
+reportPrivateUsage = false
 include = ["src"]
 # ignore = ["tests"]
 exclude = [
