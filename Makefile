@@ -13,7 +13,7 @@ typing-all:
 	uv run --with mypy -- python -m mypy --strict .
 
 tests-all:
-	uv run python -m unittest discover -v -s tests -t .
+	uv run python -m unittest discover -v -s tests/unit -t tests/unit/
 
 lint-file:
 	uv run ruff check --force-exclude $(FILE)
@@ -22,7 +22,7 @@ typing-file:
 	uv run --with mypy -- python -m mypy --strict $(FILE)
 
 test-file:
-	uv run python -m unittest discover -v -s $(dir $(FILE)) -t . -p $(notdir $(FILE))
+	uv run python -m unittest discover -v -s $(dir $(FILE)) -t tests/unit/ -p $(notdir $(FILE))
 
 pre-commit:
 	uv run python -m pre_commit run --all-files

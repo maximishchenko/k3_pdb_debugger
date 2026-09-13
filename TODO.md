@@ -1,9 +1,9 @@
 # TO-DO list
 
 - [ ] check and refactor naming
-- [ ] k3_pdb_debugger `__init__.py` return only breakpoint and set_trace
+- [x] k3_pdb_debugger `__init__.py` return only breakpoint and set_trace
 - [x] fix imports at tests
-- [ ] change tests structure to tests/unit
+- [x] change tests structure to tests/unit
 - [ ] add e2e tests
 - [ ] add CI pipeline (tests, mypy, ruff)
 - [x] lint and typing in tests
