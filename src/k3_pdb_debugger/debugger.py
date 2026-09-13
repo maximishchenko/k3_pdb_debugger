@@ -6,7 +6,8 @@ import pdb
 import sys
 from typing import Any, overload
 
-from .k3_pdb import BdbQuitExceptHook, ConditionalTrace, DebugConsole
+from .io import DebugConsole
+from .k3_pdb import BdbQuitExceptHook, ConditionalTrace
 
 
 class K3Pdb(pdb.Pdb):
@@ -63,7 +64,7 @@ class K3Pdb(pdb.Pdb):
 class K3Debugger:
     """Точка входа отладчика: открывает консоль К3 и запускает `pdb`.
 
-    Объединяет консоль (`_DebugConsole`), подмену `sys.excepthook`
+    Объединяет консоль (`DebugConsole`), подмену `sys.excepthook`
     (`_BdbQuitExceptHook`) и сессию `pdb` (`_K3Pdb`) в единый сценарий
     `set_trace`, используемый как `k3_pdb.set_trace`/`k3_pdb.breakpoint`.
     """
