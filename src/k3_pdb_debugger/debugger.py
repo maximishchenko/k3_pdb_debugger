@@ -6,8 +6,8 @@ import pdb
 import sys
 from typing import Any, overload
 
+from .decorator import ConditionalTrace
 from .io import DebugConsole
-from .k3_pdb import ConditionalTrace
 from .runtime import BdbQuitExceptHook
 
 

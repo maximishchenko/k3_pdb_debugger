@@ -1,4 +1,4 @@
-"""Тест консольного pdb-отладчика К3 (k3_pdb)."""
+"""Тест консольного pdb-отладчика К3 (k3_pdb_debugger)."""
 
 import bdb
 import sys
@@ -8,8 +8,8 @@ from unittest.mock import MagicMock, patch
 from src.k3_pdb_debugger import (
     breakpoint,
     debugger,
+    decorator,
     io,
-    k3_pdb,
     runtime,
     set_trace,
 )
@@ -242,7 +242,7 @@ class TestConditionalTrace(unittest.TestCase):
         def func(a, b):
             return a + b
 
-        decorated = k3_pdb.ConditionalTrace(debugger, False)(func)
+        decorated = decorator.ConditionalTrace(debugger, False)(func)
 
         self.assertIs(decorated, func)
         debugger.set_trace.assert_not_called()
@@ -257,7 +257,7 @@ class TestConditionalTrace(unittest.TestCase):
             calls.append("func")
             return a + b
 
-        decorated = k3_pdb.ConditionalTrace(debugger, True)(func)
+        decorated = decorator.ConditionalTrace(debugger, True)(func)
         result = decorated(2, 3)
 
         self.assertEqual(result, 5)
@@ -270,7 +270,7 @@ class TestConditionalTrace(unittest.TestCase):
         def func(a, b):
             return a + b
 
-        decorated = k3_pdb.ConditionalTrace(debugger, True)(func)
+        decorated = decorator.ConditionalTrace(debugger, True)(func)
 
         self.assertEqual(decorated.__name__, "func")
 
@@ -336,17 +336,19 @@ class TestK3Debugger(unittest.TestCase):
 
         for enable in (True, False):
             with self.subTest(enable=enable):
-                decorator = debugger_instance.set_trace(enable=enable)
-                self.assertIsInstance(decorator, k3_pdb.ConditionalTrace)
-                self.assertIs(decorator._debugger, debugger_instance)
-                self.assertIs(decorator._enable, enable)
+                decorator_item = debugger_instance.set_trace(enable=enable)
+                self.assertIsInstance(
+                    decorator_item, decorator.ConditionalTrace
+                )
+                self.assertIs(decorator_item._debugger, debugger_instance)
+                self.assertIs(decorator_item._enable, enable)
 
     def test_set_trace_module_attribute_is_bound_to_singleton(self):
-        """k3_pdb.set_trace должен быть методом модульного экземпляра."""
+        """set_trace должен быть методом модульного экземпляра."""
         self.assertEqual(set_trace, set_trace)
 
     def test_breakpoint_alias_points_to_set_trace(self):
-        """k3_pdb.breakpoint должна быть алиасом k3_pdb.set_trace."""
+        """Функция breakpoint должна быть алиасом set_trace."""
         self.assertIs(breakpoint, set_trace)
 
 
