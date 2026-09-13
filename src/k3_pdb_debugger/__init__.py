@@ -1,6 +1,6 @@
 """Обработчик запуска python отладчика pdb в среде приложения К3-Мебель."""
 
-from . import debugger, io
+from . import debugger, io, runtime
 
 debugger_instance = debugger.K3Debugger()
 
@@ -10,4 +10,4 @@ set_trace = debugger_instance.set_trace
 # встроенном breakpoint().
 breakpoint = set_trace
 
-__all__ = ["breakpoint", "debugger", "io", "set_trace"]
+__all__ = ["breakpoint", "debugger", "io", "runtime", "set_trace"]

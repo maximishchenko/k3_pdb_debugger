@@ -7,7 +7,8 @@ import sys
 from typing import Any, overload
 
 from .io import DebugConsole
-from .k3_pdb import BdbQuitExceptHook, ConditionalTrace
+from .k3_pdb import ConditionalTrace
+from .runtime import BdbQuitExceptHook
 
 
 class K3Pdb(pdb.Pdb):

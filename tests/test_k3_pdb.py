@@ -10,6 +10,7 @@ from src.k3_pdb_debugger import (
     debugger,
     io,
     k3_pdb,
+    runtime,
     set_trace,
 )
 
@@ -135,18 +136,18 @@ class TestBdbQuitExceptHook(unittest.TestCase):
 
     def test_bdb_quit_is_replaced_with_short_message(self):
         """BdbQuit не должен показываться в консоли К3 трейсбеком."""
-        hook = k3_pdb.BdbQuitExceptHook()
+        hook = runtime.BdbQuitExceptHook()
         hook._original = MagicMock()
 
         with patch("builtins.print") as mock_print:
             hook(bdb.BdbQuit, bdb.BdbQuit(), None)
 
-        mock_print.assert_called_once_with(k3_pdb._QUIT_MESSAGE)
+        mock_print.assert_called_once_with(runtime._QUIT_MESSAGE)
         hook._original.assert_not_called()
 
     def test_other_exceptions_are_forwarded_unchanged(self):
         """Прочие исключения должны обрабатываться как обычно."""
-        hook = k3_pdb.BdbQuitExceptHook()
+        hook = runtime.BdbQuitExceptHook()
         hook._original = MagicMock()
         exc_value = ValueError("boom")
 
@@ -156,7 +157,7 @@ class TestBdbQuitExceptHook(unittest.TestCase):
 
     def test_ensure_installed_replaces_hook_once(self):
         """Хук должен подменяться единожды и указывать на себя."""
-        hook = k3_pdb.BdbQuitExceptHook()
+        hook = runtime.BdbQuitExceptHook()
         original_hook = sys.excepthook
         try:
             sys.excepthook = original_hook
