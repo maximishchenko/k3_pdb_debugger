@@ -5,7 +5,7 @@ import sys
 import unittest
 from unittest.mock import MagicMock, patch
 
-from src import k3_pdb
+from src.k3_pdb_debugger import k3_pdb
 
 
 class TestDebugConsole(unittest.TestCase):

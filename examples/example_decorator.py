@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-from src import k3_pdb
+from src.k3_pdb_debugger import k3_pdb
 
 
 @k3_pdb.set_trace(enable=True)
