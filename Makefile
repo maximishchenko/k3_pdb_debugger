@@ -1,6 +1,6 @@
 .PHONY: lint-all typing-all tests-all check-all \
         lint-file typing-file test-file check-file \
-        pre-commit sync check-commit-msg coverage
+        pre-commit sync check-commit-msg coverage e2e
 
 check-all: lint-all typing-all tests-all coverage
 
@@ -39,6 +39,12 @@ check-commit-msg:
 coverage:
 	uv run python -m coverage run -m unittest discover -s tests/unit -t tests/unit
 	uv run python -m coverage report
+
+# Требуют реального консольного окна процесса (не headless), но не
+# требуют запущенного К3-Мебель — тесты сами пропускаются, если
+# процесс не прикреплён к консоли.
+e2e:
+	uv run python -m unittest discover -v -s tests/e2e -t tests/e2e
 
 %:
 	@:

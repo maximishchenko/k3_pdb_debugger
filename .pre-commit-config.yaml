@@ -25,6 +25,14 @@ repos:
             pass_filenames: false
             always_run: true
 
+          - id: e2e
+            name: run e2e tests
+            entry: make e2e
+            language: system
+            types: [python]
+            pass_filenames: false
+            always_run: true
+
           - id: commitizen
             name: commitizen check
             entry: make check-commit-msg
