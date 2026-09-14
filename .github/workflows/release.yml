@@ -15,6 +15,12 @@ on:
     push:
         branches: [main]
 
+env:
+    # см. комментарий в ci.yml: GitHub больше не поставляет сборки Python
+    # 3.7 для актуальных образов раннеров, поэтому commitizen/uv тут тоже
+    # запускаются под современным Python независимо от .python-version.
+    UV_PYTHON: "3.11"
+
 permissions:
     contents: write
     pull-requests: write
