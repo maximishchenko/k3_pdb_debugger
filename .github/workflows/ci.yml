@@ -1,0 +1,81 @@
+name: CI
+
+on:
+    push:
+        branches-ignore: [main]
+    pull_request:
+
+env:
+    # requires-python в pyproject.toml — ">=3.7", а .python-version в
+    # репозитории закреплён на 3.7 для локальной разработки под реальный
+    # встроенный интерпретатор К3-Мебель. Но GitHub больше не поставляет
+    # сборки Python 3.7 для актуальных образов раннеров (actions/setup-python
+    # падает с "was not found for Ubuntu 24.04"), а сам код версия-
+    # независимый (чистый Python, from __future__ import annotations).
+    # Поэтому в CI инструменты запускаются под современным Python; за
+    # совместимость с 3.7 отвечают target-version/python_version в
+    # конфигурации ruff и mypy (pyproject.toml), а не сам интерпретатор.
+    UV_PYTHON: "3.11"
+
+jobs:
+    lint:
+        name: Lint
+        runs-on: ubuntu-latest
+        steps:
+            - uses: actions/checkout@v5
+
+            - uses: astral-sh/setup-uv@v10.1.0
+              with:
+                  enable-cache: true
+
+            - name: Run lint
+              run: make lint-all
+
+    typing:
+        name: Typing
+        runs-on: ubuntu-latest
+        steps:
+            - uses: actions/checkout@v5
+
+            - uses: astral-sh/setup-uv@v10.1.0
+              with:
+                  enable-cache: true
+
+            - name: Run typing
+              run: make typing-all
+
+    tests:
+        name: Tests (coverage)
+        runs-on: windows-latest
+        steps:
+            - uses: actions/checkout@v5
+
+            - uses: astral-sh/setup-uv@v10.1.0
+              with:
+                  enable-cache: true
+
+            - name: Install make
+              run: choco install make --no-progress -y
+
+            - name: Run tests with coverage
+              run: make coverage
+
+    # e2e-тесты сами пропускаются (SkipTest), если процесс не прикреплён
+    # к реальному консольному окну (tests/e2e/console_helpers.py) — на
+    # headless-раннере GitHub Actions это ожидаемо и не валит билд, но
+    # и не даёт реального сигнала; см. README тестов.
+    e2e:
+        name: E2E
+        runs-on: windows-latest
+        steps:
+            - uses: actions/checkout@v5
+
+            - uses: astral-sh/setup-uv@v10.1.0
+              with:
+                  enable-cache: true
+
+            - name: Install make
+              run: choco install make --no-progress -y
+
+            - name: Run e2e tests
+              run: make e2e

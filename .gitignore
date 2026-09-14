@@ -11,3 +11,13 @@ wheels/
 
 # Virtual environments
 .venv
+
+# Python coverage
+.coverage
+htmlcov/
+
+# MyST build outputs
+_build
+
+# NodeJS
+node_modules/

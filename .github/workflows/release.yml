@@ -1,0 +1,113 @@
+name: Release
+
+# Прямой push в main запрещён настройками репозитория (только PR), поэтому
+# версия/CHANGELOG.md не пушатся в main напрямую. Вместо этого:
+#   1. propose-release готовит ветку release/next с бампом версии и
+#      CHANGELOG.md и открывает/обновляет обычный PR в main.
+#   2. Когда этот PR смёржен человеком, tag-release обнаруживает, что
+#      версия в pyproject.toml ещё не имеет тега, и создаёт тег + GitHub
+#      Release на HEAD main.
+# Джобы независимы и идемпотентны: если нет коммитов, подходящих под
+# conventional commits, propose-release ничего не делает; если версия уже
+# затегирована, tag-release ничего не делает.
+
+on:
+    push:
+        branches: [main]
+
+permissions:
+    contents: write
+    pull-requests: write
+
+jobs:
+    propose-release:
+        name: Propose release PR
+        runs-on: ubuntu-latest
+        steps:
+            - uses: actions/checkout@v5
+              with:
+                  fetch-depth: 0
+
+            - uses: astral-sh/setup-uv@v10.1.0
+              with:
+                  enable-cache: true
+
+            - name: Configure git identity
+              run: |
+                  git config user.name "github-actions[bot]"
+                  git config user.email "github-actions[bot]@users.noreply.github.com"
+
+            - name: Reset release branch from main
+              run: git checkout -B release/next
+
+            - name: Bump version and update CHANGELOG.md
+              id: bump
+              run: |
+                  if uv run python -m commitizen bump --changelog --yes; then
+                      echo "bumped=true" >> "$GITHUB_OUTPUT"
+                  else
+                      echo "No releasable commits since last tag, skipping."
+                      echo "bumped=false" >> "$GITHUB_OUTPUT"
+                  fi
+
+            - name: Push release branch
+              if: steps.bump.outputs.bumped == 'true'
+              run: git push --force origin release/next
+
+            - name: Open or update release pull request
+              if: steps.bump.outputs.bumped == 'true'
+              env:
+                  GH_TOKEN: ${{ github.token }}
+              run: |
+                  VERSION=$(uv run python -m commitizen version --project)
+                  PR_NUMBER=$(gh pr list --base main --head release/next --state open --json number --jq '.[0].number')
+                  if [ -n "$PR_NUMBER" ]; then
+                      gh pr edit "$PR_NUMBER" --title "chore(release): v$VERSION"
+                  else
+                      gh pr create --base main --head release/next \
+                          --title "chore(release): v$VERSION" \
+                          --body "Автоматически сформированный релизный PR. Версия и CHANGELOG.md обновлены commitizen на основе conventional commits. Слияние этого PR запустит создание тега v$VERSION и GitHub Release."
+                  fi
+
+    tag-release:
+        name: Tag release and publish GitHub Release
+        runs-on: ubuntu-latest
+        steps:
+            - uses: actions/checkout@v5
+              with:
+                  fetch-depth: 0
+
+            - uses: astral-sh/setup-uv@v10.1.0
+              with:
+                  enable-cache: true
+
+            - name: Check whether current version is already tagged
+              id: check
+              run: |
+                  VERSION=$(uv run python -m commitizen version --project)
+                  TAG="v$VERSION"
+                  if git rev-parse "$TAG" >/dev/null 2>&1; then
+                      echo "release=false" >> "$GITHUB_OUTPUT"
+                  else
+                      echo "release=true" >> "$GITHUB_OUTPUT"
+                      echo "version=$VERSION" >> "$GITHUB_OUTPUT"
+                      echo "tag=$TAG" >> "$GITHUB_OUTPUT"
+                  fi
+
+            - name: Create and push tag
+              if: steps.check.outputs.release == 'true'
+              run: |
+                  git config user.name "github-actions[bot]"
+                  git config user.email "github-actions[bot]@users.noreply.github.com"
+                  git tag "${{ steps.check.outputs.tag }}"
+                  git push origin "${{ steps.check.outputs.tag }}"
+
+            - name: Create GitHub Release from CHANGELOG.md
+              if: steps.check.outputs.release == 'true'
+              env:
+                  GH_TOKEN: ${{ github.token }}
+              run: |
+                  uv run python -m commitizen changelog "${{ steps.check.outputs.version }}" --dry-run > release-notes.md
+                  gh release create "${{ steps.check.outputs.tag }}" \
+                      --title "${{ steps.check.outputs.tag }}" \
+                      --notes-file release-notes.md

@@ -13,10 +13,18 @@ dependencies = []
 [dependency-groups]
 dev = [
     "commitizen>=3.9.1",
+    "coverage>=7.2.7",
     "mypy>=1.4.1",
     "pre-commit>=2.21.0",
     "ruff>=0.16.6",
 ]
+
+[tool.commitizen]
+name = "cz_conventional_commits"
+version_provider = "pep621"
+tag_format = "v$version"
+update_changelog_on_bump = true
+major_version_zero = true
 
 [tool.ruff]
 fix = false
@@ -70,6 +78,16 @@ warn_return_any = true
 warn_unused_configs = true
 disallow_untyped_defs = true
 strict = true
+# Пакет рассчитан только на Windows (ctypes.windll и т.п.). Явно
+# фиксируем платформу, чтобы typing-стадия CI могла запускаться на
+# ubuntu-раннерах и при этом видеть Windows-ветку тайпшедов ctypes.
+platform = "win32"
+# Целевая версия интерпретатора для проекта — 3.7 (requires-python),
+# но сам mypy в CI запускается под современным Python, так как
+# GitHub больше не поставляет сборки 3.7 для актуальных образов
+# раннеров. python_version фиксирует проверку типов на 3.7 независимо
+# от того, под чем реально исполняется mypy.
+python_version = "3.7"
 
 
 explicit_package_bases = true
@@ -81,17 +99,21 @@ exclude = [
 ]
 
 [tool.pyright]
+reportPrivateUsage = false
 include = ["src"]
-ignore = ["tests"]
 exclude = [
-    "**/node_modules",
     "**/__pycache__",
     ".git",
     ".venv",
-    "build",
-    "dist",
 ]
 typeCheckingMode = "strict"
 
 [tool.uv]
 link-mode = "copy"
+
+[tool.coverage.run]
+omit = ["tests/*"]
+
+[tool.coverage.report]
+fail_under = 80
+show_missing = true

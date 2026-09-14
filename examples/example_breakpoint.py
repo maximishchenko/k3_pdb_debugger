@@ -7,9 +7,9 @@ from __future__ import annotations
 
 import sys
 
-from src import k3_pdb
+from src.k3_pdb_debugger import set_trace
 
-sys.breakpointhook = k3_pdb.set_trace
+sys.breakpointhook = set_trace
 
 
 def function(a: int | float, b: int | float) -> int | float:
