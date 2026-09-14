@@ -144,3 +144,5 @@ def function(a: int | float, b: int | float) -> int | float:
 > ```shell
 > make check-all
 > ```
+
+> Все указанные проверки в рамках проекта выполняются как на стадии `pre-commit`, так и на стадии `CI`.
