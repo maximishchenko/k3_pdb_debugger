@@ -1,0 +1,66 @@
+name: CI
+
+on:
+    push:
+        branches-ignore: [main]
+    pull_request:
+
+env:
+    PYTHON_VERSION: "3.7"
+
+jobs:
+    lint:
+        name: Lint
+        runs-on: ubuntu-latest
+        steps:
+            - uses: actions/checkout@v4
+
+            - uses: actions/setup-python@v5
+              with:
+                  python-version: ${{ env.PYTHON_VERSION }}
+
+            - uses: astral-sh/setup-uv@v5
+              with:
+                  enable-cache: true
+
+            - name: Run lint
+              run: make lint-all
+
+    typing:
+        name: Typing
+        runs-on: ubuntu-latest
+        steps:
+            - uses: actions/checkout@v4
+
+            - uses: actions/setup-python@v5
+              with:
+                  python-version: ${{ env.PYTHON_VERSION }}
+
+            - uses: astral-sh/setup-uv@v5
+              with:
+                  enable-cache: true
+
+            - name: Run typing
+              run: make typing-all
+
+    # src/k3_pdb_debugger/io.py на уровне модуля обращается к ctypes.windll.kernel32 — атрибута,
+    # которого в стандартной библиотеке просто не существует вне Windows - используется windows-latest.
+    tests:
+        name: Tests (coverage)
+        runs-on: windows-latest
+        steps:
+            - uses: actions/checkout@v4
+
+            - uses: actions/setup-python@v5
+              with:
+                  python-version: ${{ env.PYTHON_VERSION }}
+
+            - uses: astral-sh/setup-uv@v5
+              with:
+                  enable-cache: true
+
+            - name: Install make
+              run: choco install make --no-progress -y
+
+            - name: Run tests with coverage
+              run: make coverage

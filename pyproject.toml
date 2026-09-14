@@ -71,6 +71,10 @@ warn_return_any = true
 warn_unused_configs = true
 disallow_untyped_defs = true
 strict = true
+# Пакет рассчитан только на Windows (ctypes.windll и т.п.). Явно
+# фиксируем платформу, чтобы typing-стадия CI могла запускаться на
+# ubuntu-раннерах и при этом видеть Windows-ветку тайпшедов ctypes.
+platform = "win32"
 
 
 explicit_package_bases = true
