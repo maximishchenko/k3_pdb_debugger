@@ -83,14 +83,10 @@ exclude = [
 [tool.pyright]
 reportPrivateUsage = false
 include = ["src"]
-# ignore = ["tests"]
 exclude = [
-    "**/node_modules",
     "**/__pycache__",
     ".git",
     ".venv",
-    "build",
-    "dist",
 ]
 typeCheckingMode = "strict"
 
