@@ -13,6 +13,7 @@ dependencies = []
 [dependency-groups]
 dev = [
     "commitizen>=3.9.1",
+    "coverage>=7.2.7",
     "mypy>=1.4.1",
     "pre-commit>=2.21.0",
     "ruff>=0.16.6",
@@ -92,3 +93,10 @@ typeCheckingMode = "strict"
 
 [tool.uv]
 link-mode = "copy"
+
+[tool.coverage.run]
+omit = ["tests/*"]
+
+[tool.coverage.report]
+fail_under = 40     # Минимальный % покрытия (хук упадет, если меньше)
+show_missing = true # Покажет в консоли номера строк, которые не покрыты тестами

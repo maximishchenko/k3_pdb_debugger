@@ -17,10 +17,11 @@ repos:
             pass_filenames: false
             always_run: true
 
-          - id: unittest
-            name: run unittests
-            entry: make tests-all
+          - id: unittest-coverage
+            name: run unittests with coverage
+            entry: make coverage
             language: system
+            types: [python]
             pass_filenames: false
             always_run: true
 

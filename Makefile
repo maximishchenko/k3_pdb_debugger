@@ -36,6 +36,10 @@ example-decorator:
 check-commit-msg:
 	uv run python -m commitizen check --commit-msg-file $(filter-out $@,$(MAKECMDGOALS))
 
+coverage:
+	uv run python -m coverage run -m unittest discover -s tests/unit -t tests/unit
+	uv run python -m coverage report
+
 %:
 	@:
 
