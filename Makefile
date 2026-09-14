@@ -1,7 +1,7 @@
 .PHONY: lint-all typing-all tests-all check-all \
         lint-file typing-file test-file check-file \
         pre-commit sync check-commit-msg coverage e2e \
-		docs
+		docs changelog
 
 check-all: lint-all typing-all tests-all coverage
 
@@ -49,6 +49,9 @@ e2e:
 
 docs:
 	npx mystmd start
+
+changelog:
+	uv run python -m commitizen changelog --dry-run
 
 %:
 	@:
