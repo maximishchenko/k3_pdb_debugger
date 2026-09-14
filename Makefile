@@ -1,6 +1,7 @@
 .PHONY: lint-all typing-all tests-all check-all \
         lint-file typing-file test-file check-file \
-        pre-commit sync check-commit-msg coverage e2e
+        pre-commit sync check-commit-msg coverage e2e \
+		docs
 
 check-all: lint-all typing-all tests-all coverage
 
@@ -45,6 +46,9 @@ coverage:
 # процесс не прикреплён к консоли.
 e2e:
 	uv run python -m unittest discover -v -s tests/e2e -t tests/e2e
+
+docs:
+	npx mystmd start
 
 %:
 	@:

@@ -15,3 +15,9 @@ wheels/
 # Python coverage
 .coverage
 htmlcov/
+
+# MyST build outputs
+_build
+
+# NodeJS
+node_modules/

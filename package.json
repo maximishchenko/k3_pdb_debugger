@@ -1,0 +1,28 @@
+{
+  "name": "k3_pdb_debugger",
+  "version": "1.0.0",
+  "description": "Надстройка для запуска интерактивного отлачика [PDB](https://docs.python.org/3/library/pdb.html), входящего в стандартную библиотеку Python, в приложении [К3 Мебель](https://k3-mebel.ru/).\r Может применяться для отладки при разработке скриптов на языке Python для приложения \"К3. Мебель\".\r Позволит произвести быструю отладку без необходимости подключения отладчика интеактивной среды разработки IDE и установки сторонних библиотек, например [ptvsd](https://github.com/microsoft/ptvsd) или [debugpy](https://github.com/microsoft/debugpy) для [VSCode](https://code.visualstudio.com/).",
+  "main": "index.js",
+  "directories": {
+    "example": "examples",
+    "test": "tests"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/maximishchenko/k3_pdb_debugger.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
+  "bugs": {
+    "url": "https://github.com/maximishchenko/k3_pdb_debugger/issues"
+  },
+  "homepage": "https://github.com/maximishchenko/k3_pdb_debugger#readme",
+  "devDependencies": {
+    "mystmd": "^1.10.1"
+  }
+}

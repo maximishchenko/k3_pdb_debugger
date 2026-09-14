@@ -1,16 +1,15 @@
-# TO-DO list
+# TODO
 
-- [x] check and refactor naming
-- [x] k3_pdb_debugger `__init__.py` return only breakpoint and set_trace
-- [x] fix imports at tests
-- [x] change tests structure to tests/unit
-- [x] add e2e tests
-- [x] add CI pipeline (tests, mypy, ruff)
-- [x] lint and typing in tests
-- [ ] docs/ (partially README.md)
-- [ ] GitHub Pages generation from docs in CI
-- [ ] Add log_to(path_to_logs) feature
-- [x] Add test coverage
-- [x] Add unittest for coverage >= 80%
-- [ ] Add CHANGELOG generation in CI or pre-commit
-- [ ] Add commitizen version tag in CI or pre-commit
+- [x] Добавить Unit тесты
+- [x] Обеспечить полное покрытие кодовой базы тестами
+- [x] Добавить End-to-end (E2E) тесты
+- [x] Добавить базовый CI pipeline (tests, mypy, ruff)
+- [x] Привести кодовую базу тестов в соответствие требованиям линтера и статического анализатора типов.
+- [x] Проверка conventional commit в стадии pre-commit
+- [ ] Публикация пакета pypi
+- [ ] Подготовить документацию.
+- [ ] Публикация страницы документации на GitHub Pages в CI pipeline
+- [ ] Добавить возможность сохранения результатов отладки в файл журнала log_to(path_to_logs).
+- [ ] Добавить генерацию CHANGELOG.md в CI pipeline
+- [ ] Автоматическое добавление тэга version в CI pipeline
+- [ ] Автоматическая публикация в pypi на стадии выполнения CI pipeline

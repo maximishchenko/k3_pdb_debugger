@@ -1,0 +1,24 @@
+# See docs at: https://mystmd.org/guide/frontmatter
+version: 1
+project:
+    id: 6728337a-6f79-471c-a143-c2c3c2ca72bb
+    title: PDB для К3 Мебель
+    description: Утилита для запуска Python отладчика pdb в среде приложения "К3. Мебель"
+    keywords: ["debugger", "pdb", "k3"]
+    authors: [Максим Ищенко <m.g.ishchenko@yandex.ru>]
+    github: https://github.com/maximishchenko/k3_pdb_debugger
+    # To autogenerate a Table of Contents, run "myst init --write-toc"
+
+    toc:
+        - file: ./README.md
+        - file: ./TODO.md
+site:
+    title: k3-pdb-debugger
+    template: book-theme
+    parts:
+        primary_sidebar_footer: ./docs/templates/sidebar_footer.md
+        footer: ./docs/templates/footer.md
+        banner: ./docs/templates/banner.md
+    options:
+        favicon: ./docs/assets/favicon.ico
+        logo: ./docs/assets/logo.webp
