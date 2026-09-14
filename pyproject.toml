@@ -98,5 +98,5 @@ link-mode = "copy"
 omit = ["tests/*"]
 
 [tool.coverage.report]
-fail_under = 40     # Минимальный % покрытия (хук упадет, если меньше)
-show_missing = true # Покажет в консоли номера строк, которые не покрыты тестами
+fail_under = 80
+show_missing = true

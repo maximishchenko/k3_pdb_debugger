@@ -75,11 +75,15 @@ class K3Debugger:
         self._console = DebugConsole()
         self._excepthook = BdbQuitExceptHook()
 
+    # Тела перегрузок (`@overload`) служат только для проверки типов и
+    # никогда не выполняются в рантайме, поэтому исключены из покрытия.
     @overload
-    def set_trace(self, enable: None = ...) -> None: ...
+    def set_trace(self, enable: None = ...) -> None: ...  # pragma: no cover
 
     @overload
-    def set_trace(self, enable: bool) -> ConditionalTrace: ...
+    def set_trace(  # pragma: no cover
+        self, enable: bool
+    ) -> ConditionalTrace: ...
 
     def set_trace(self, enable: bool | None = None) -> ConditionalTrace | None:
         """Остановиться в вызывающем коде либо вернуть декоратор.

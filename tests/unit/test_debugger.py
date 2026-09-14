@@ -17,7 +17,12 @@ class TestK3Pdb(unittest.TestCase):
         debugger_instance = debugger.K3Pdb(console)
         debugger_instance.reset()
 
-        result = debugger_instance.do_quit("")
+        # bdb.Bdb.set_quit() вызывает sys.settrace(None), что снимает
+        # собственный трассировщик coverage.py для всего оставшегося
+        # процесса. Здесь это не нужно проверять, поэтому подменяем
+        # settrace, не давая тесту исказить покрытие остальных тестов.
+        with patch("sys.settrace"):
+            result = debugger_instance.do_quit("")
 
         self.assertTrue(result)
         self.assertTrue(debugger_instance.quitting)
@@ -29,7 +34,11 @@ class TestK3Pdb(unittest.TestCase):
         debugger_instance = debugger.K3Pdb(console)
         debugger_instance.reset()
 
-        result = debugger_instance.do_continue("")
+        # См. комментарий в test_do_quit_releases_console_after_default_
+        # behaviour: bdb.Bdb.set_continue() тоже вызывает
+        # sys.settrace(None).
+        with patch("sys.settrace"):
+            result = debugger_instance.do_continue("")
 
         self.assertTrue(result)
         console.release.assert_called_once()

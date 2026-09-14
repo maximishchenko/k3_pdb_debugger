@@ -11,5 +11,6 @@
 - [ ] GitHub Pages generation from docs in CI
 - [ ] Add log_to(path_to_logs) feature
 - [x] Add test coverage
+- [x] Add unittest for coverage >= 80%
 - [ ] Add CHANGELOG generation in CI or pre-commit
 - [ ] Add commitizen version tag in CI or pre-commit

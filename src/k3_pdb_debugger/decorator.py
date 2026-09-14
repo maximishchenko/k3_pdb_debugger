@@ -11,7 +11,7 @@ from typing import (
     cast,
 )
 
-if TYPE_CHECKING:
+if TYPE_CHECKING:  # pragma: no cover
     from .debugger import K3Debugger
 
 _F = TypeVar("_F", bound=Callable[..., Any])
