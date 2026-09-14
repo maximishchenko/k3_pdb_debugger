@@ -34,7 +34,7 @@ TODO добавить.
 
 Для подключения текущего модуля к глобальному вызову breakpoint (начиная с версии Python 3.7) возможно использовать 2 способа:
 
-1. Установить значение переменной окружения PYTHONBREAKPOINT
+- Установить значение переменной окружения PYTHONBREAKPOINT
 
 ```python
 from __future__ import annotations
@@ -46,7 +46,7 @@ set PYTHONBREAKPOINT=set_trace
 
 > Пакет `k3_pdb_debugger` должен находиться в области видимости `sys.path`
 
-1. Перехватить вызов `sys.breakpointhook` глобально
+- Перехватить вызов `sys.breakpointhook` глобально
 
 ```python
 from __future__ import annotations

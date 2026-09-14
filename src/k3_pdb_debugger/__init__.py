@@ -71,7 +71,7 @@ from k3_pdb_debugger import set_trace
 def function(a: int | float, b: int | float) -> int | float:
     ...
 
-@k3_pdb.set_trace(enable=False)  # отладка не запускается
+@set_trace(enable=False)  # отладка не запускается
 def function(a: int | float, b: int | float) -> int | float:
     ...
 ```
