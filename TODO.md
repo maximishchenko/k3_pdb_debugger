@@ -10,3 +10,6 @@
 - [ ] docs/ (partially README.md)
 - [ ] GitHub Pages generation from docs in CI
 - [ ] Add log_to(path_to_logs) feature
+- [x] Add test coverage
+- [ ] Add CHANGELOG generation in CI or pre-commit
+- [ ] Add commitizen version tag in CI or pre-commit
